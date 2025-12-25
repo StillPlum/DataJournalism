@@ -1,5 +1,6 @@
 /* style.css - 完整优化版（含下拉框修复） */
 :root {
+  color-scheme: dark; /* 让支持的浏览器用暗色原生表单控件 */
   --bg: #050914;
   --panel: rgba(20, 30, 48, 0.6);
   --panel-border: rgba(255, 255, 255, 0.08);
@@ -118,10 +119,13 @@ select, input[type="search"] {
   transition: all 0.2s;
 }
 
+select { color-scheme: dark; }
+
+
 /* === 核心修复：强制下拉选项背景为深色 === */
 select option {
   background-color: #050914; /* 必须是实心颜色 */
-  color: #fff;
+  /* 不强制 option 文字颜色：避免系统白底下拉时出现白底白字 */
 }
 
 select:focus, input:focus {

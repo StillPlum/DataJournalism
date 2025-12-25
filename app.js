@@ -11,6 +11,17 @@ const state = {
   selectedProvince: null,
 };
 
+function rankOf(metricKey, provinceName) {
+  const sorted = [...state.data.provinces].sort((a, b) => b[metricKey] - a[metricKey]);
+  const idx = sorted.findIndex(d => d.province === provinceName);
+  return idx >= 0 ? idx + 1 : null;
+}
+
+function fmtByKey(metricKey, value) {
+  const { formatter } = byMetricKey(metricKey);
+  return formatter(value);
+}
+
 async function loadData() {
   const [prov, region] = await Promise.all([
     fetch('data/province_2024.json').then(r => r.json()),
@@ -63,14 +74,17 @@ function renderProvinceChart(metricKey) {
   const y = data.map(d => d.province);
 
   // highlight selected
-  const colors = data.map(d => d.province === state.selectedProvince ? 'rgba(255,255,255,.9)' : 'rgba(160,180,200,.55)');
+  const colors = data.map(d => d.province === state.selectedProvince ? 'rgba(125,211,252,.95)' : 'rgba(160,180,200,.55)');
+
+  const customdata = x.map(v => formatter(v));
 
   const trace = {
     type: 'bar',
     orientation: 'h',
     x, y,
     marker: { color: colors },
-    hovertemplate: `%{y}<br>${label}：%{x}<extra></extra>`,
+    customdata,
+    hovertemplate: `%{y}<br>${label}：%{customdata}<extra></extra>`,
   };
 
   const layout = {
@@ -93,21 +107,24 @@ function renderProvinceChart(metricKey) {
   });
 }
 
-function renderGrowthChart() {
+function renderTopChart(metricKey) {
+  const { label, formatter } = byMetricKey(metricKey);
   const top = [...state.data.provinces]
-    .sort((a,b) => b.volume_yoy_pct - a.volume_yoy_pct)
+    .sort((a, b) => b[metricKey] - a[metricKey])
     .slice(0, 10);
 
-  const x = top.map(d => d.volume_yoy_pct);
+  const x = top.map(d => d[metricKey]);
   const y = top.map(d => d.province);
-  const colors = top.map(d => d.province === state.selectedProvince ? 'rgba(255,255,255,.9)' : 'rgba(160,180,200,.55)');
+  const colors = top.map(d => d.province === state.selectedProvince ? 'rgba(125,211,252,.95)' : 'rgba(160,180,200,.55)');
+  const customdata = x.map(v => formatter(v));
 
   const trace = {
     type: 'bar',
     orientation: 'h',
     x, y,
     marker: { color: colors },
-    hovertemplate: `%{y}<br>业务量同比：%{x}%<extra></extra>`,
+    customdata,
+    hovertemplate: `%{y}<br>${label}：%{customdata}<extra></extra>`,
   };
 
   const layout = {
@@ -115,12 +132,12 @@ function renderGrowthChart() {
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
     font: { color: '#e6edf3' },
-    xaxis: { title: '业务量同比（%）', gridcolor: 'rgba(255,255,255,.06)', zerolinecolor: 'rgba(255,255,255,.06)' },
+    xaxis: { title: label, gridcolor: 'rgba(255,255,255,.06)', zerolinecolor: 'rgba(255,255,255,.06)' },
     yaxis: { automargin: true },
     height: 420,
   };
 
-  Plotly.react('chartGrowth', [trace], layout, {displayModeBar: false, responsive: true});
+  Plotly.react('chartGrowth', [trace], layout, { displayModeBar: false, responsive: true });
 
   const chartDiv = document.getElementById('chartGrowth');
   chartDiv.on('plotly_click', (ev) => {
@@ -161,18 +178,32 @@ function setSelectedProvince(name) {
   const p = state.data.provinces.find(d => d.province === name) || state.data.provinces[0];
   setCards(p);
 
+  // keep select in sync
+  const provSel = document.getElementById('provinceSelect');
+  if (provSel && provSel.value !== p.province) provSel.value = p.province;
+
   // auto summary sentence
   const nat = state.data.national;
-  const sortedByVol = [...state.data.provinces].sort((a,b) => b.volume_billion - a.volume_billion);
-  const rank = sortedByVol.findIndex(d => d.province === p.province) + 1;
   const share = (p.volume_billion / nat.volume_billion) * 100;
-  const summary = `${p.province} 2024年快递业务量${fmt.piecesB(p.volume_billion)}，全国第${rank}，占全国${share.toFixed(2)}%；同比${fmt.pct(p.volume_yoy_pct)}。`;
+  const rankVol = rankOf('volume_billion', p.province);
+  const rankYoY = rankOf('volume_yoy_pct', p.province);
+  const rankRev = rankOf('revenue_billion_yuan', p.province);
+  const summary = `【${p.province}】业务量 ${fmt.piecesB(p.volume_billion)}（第${rankVol}，占全国${share.toFixed(2)}%），同比 ${fmt.pct(p.volume_yoy_pct)}（第${rankYoY}）；收入 ${fmt.yuanB(p.revenue_billion_yuan)}（第${rankRev}），同比 ${fmt.pct(p.revenue_yoy_pct)}。`;
   const el = document.getElementById('autoSummary');
   if (el) el.textContent = summary;
 
+  // hero meta (national + region shares 2024)
+  const r2024 = state.region.find(d => d.year === 2024) || state.region[state.region.length - 1];
+  const hero = document.getElementById('heroMeta');
+  if (hero && r2024) {
+    hero.textContent = `2024 全国：${fmt.piecesB(nat.volume_billion)}（同比${fmt.pct(nat.volume_yoy_pct)}）；东/中/西部占比：${r2024.east}% / ${r2024.central}% / ${r2024.west}%。`;
+  }
+
   const metricKey = document.getElementById('metricSelect').value;
   renderProvinceChart(metricKey);
-  renderGrowthChart();
+
+  const topKey = document.getElementById('topSelect')?.value || 'volume_yoy_pct';
+  renderTopChart(topKey);
 }
 
 function initControls() {
@@ -180,8 +211,24 @@ function initControls() {
   provSel.innerHTML = state.data.provinces.map(p => `<option value="${p.province}">${p.province}</option>`).join('');
   provSel.addEventListener('change', () => setSelectedProvince(provSel.value));
 
+  const provSearch = document.getElementById('provinceSearch');
+  if (provSearch) {
+    provSearch.addEventListener('input', () => {
+      const q = (provSearch.value || '').trim();
+      if (!q) return;
+      const hit = state.data.provinces.find(p => p.province.includes(q));
+      if (hit) setSelectedProvince(hit.province);
+    });
+  }
+
   const metricSel = document.getElementById('metricSelect');
-  metricSel.addEventListener('change', () => renderProvinceChart(metricSel.value));
+  metricSel.addEventListener('change', () => {
+    renderProvinceChart(metricSel.value);
+    if (state.selectedProvince) setSelectedProvince(state.selectedProvince);
+  });
+
+  const topSel = document.getElementById('topSelect');
+  if (topSel) topSel.addEventListener('change', () => renderTopChart(topSel.value));
 }
 
 async function main() {

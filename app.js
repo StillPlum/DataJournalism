@@ -1,7 +1,9 @@
 /* global Plotly */
+
+// 格式化工具
 const fmt = {
-  piecesB: (x) => `${x.toFixed(1)} 亿件`,
-  yuanB: (x) => `${x.toFixed(1)} 亿元`,
+  piecesB: (x) => `${x.toFixed(2)}`, // 去掉单位，在UI中处理
+  yuanB: (x) => `${x.toFixed(1)}`,
   pct: (x) => `${x.toFixed(1)}%`,
 };
 
@@ -11,239 +13,185 @@ const state = {
   selectedProvince: null,
 };
 
+// 辅助函数：获取排名
 function rankOf(metricKey, provinceName) {
   const sorted = [...state.data.provinces].sort((a, b) => b[metricKey] - a[metricKey]);
   const idx = sorted.findIndex(d => d.province === provinceName);
   return idx >= 0 ? idx + 1 : null;
 }
 
-function fmtByKey(metricKey, value) {
-  const { formatter } = byMetricKey(metricKey);
-  return formatter(value);
+// 辅助函数：图表配置
+function getChartLayout(titleX, titleY) {
+  return {
+    margin: { l: 80, r: 30, t: 30, b: 50 },
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+    font: { color: '#94a3b8', family: '-apple-system, sans-serif' },
+    xaxis: { 
+      title: titleX, 
+      gridcolor: 'rgba(255,255,255,0.05)', 
+      zerolinecolor: 'rgba(255,255,255,0.1)' 
+    },
+    yaxis: { 
+      automargin: true,
+      gridcolor: 'rgba(255,255,255,0.05)'
+    },
+    barcorner: 4,
+  };
 }
 
 async function loadData() {
-  const [prov, region] = await Promise.all([
-    fetch('data/province_2024.json').then(r => r.json()),
-    fetch('data/region_share.json').then(r => r.json()),
-  ]);
-  state.data = prov;
-  state.region = region;
+  try {
+    const [prov, region] = await Promise.all([
+      fetch('data/province_2024.json').then(r => r.json()),
+      fetch('data/region_share.json').then(r => r.json()),
+    ]);
+    state.data = prov;
+    state.region = region;
+  } catch (e) {
+    console.error("Data Load Error", e);
+    alert("数据加载失败，请确保通过本地服务器或 GitHub Pages 访问。");
+  }
 }
 
-function byMetricKey(key) {
-  const label = {
-    volume_billion: '快递业务量（亿件）',
-    volume_yoy_pct: '业务量同比（%）',
-    revenue_billion_yuan: '快递业务收入（亿元）',
-    revenue_yoy_pct: '收入同比（%）',
-  }[key];
-  const formatter = {
-    volume_billion: fmt.piecesB,
-    volume_yoy_pct: fmt.pct,
-    revenue_billion_yuan: fmt.yuanB,
-    revenue_yoy_pct: fmt.pct,
-  }[key];
-  return { label, formatter };
-}
-
-function setCards(p) {
+function updateCards(p) {
   const nat = state.data.national;
+  const share = (p.volume_billion / nat.volume_billion) * 100;
+  
+  // 全国卡片
+  document.getElementById('nationalVolume').innerHTML = 
+    `${fmt.piecesB(nat.volume_billion)} <span style="font-size:14px;color:#94a3b8">亿件</span>`;
+  document.getElementById('nationalVolumeYoy').textContent = 
+    `同比增长 ${fmt.pct(nat.volume_yoy_pct)}`;
 
-  document.getElementById('nationalVolume').textContent = fmt.piecesB(nat.volume_billion);
-  document.getElementById('nationalVolumeYoy').textContent = `同比 ${fmt.pct(nat.volume_yoy_pct)}`;
-
+  // 省份卡片
   document.getElementById('selProvinceName').textContent = p.province;
   document.getElementById('selProvinceName2').textContent = p.province;
 
-  document.getElementById('selVolume').textContent = fmt.piecesB(p.volume_billion);
-  const share = (p.volume_billion / nat.volume_billion) * 100;
-  document.getElementById('selVolumeMeta').textContent =
-    `同比 ${fmt.pct(p.volume_yoy_pct)} · 占全国 ${share.toFixed(2)}%`;
+  document.getElementById('selVolume').innerHTML = 
+    `${fmt.piecesB(p.volume_billion)} <span style="font-size:14px;color:#94a3b8">亿件</span>`;
+  document.getElementById('selVolumeMeta').innerHTML =
+    `<span style="color:${p.volume_yoy_pct > nat.volume_yoy_pct ? '#facc15' : '#94a3b8'}">同比 ${p.volume_yoy_pct > 0 ? '+' : ''}${fmt.pct(p.volume_yoy_pct)}</span> · 贡献全国 ${share.toFixed(1)}%`;
 
-  document.getElementById('selRevenue').textContent = fmt.yuanB(p.revenue_billion_yuan);
-  document.getElementById('selRevenueMeta').textContent =
-    `同比 ${fmt.pct(p.revenue_yoy_pct)}`;
+  document.getElementById('selRevenue').innerHTML = 
+    `${fmt.yuanB(p.revenue_billion_yuan)} <span style="font-size:14px;color:#94a3b8">亿元</span>`;
+  document.getElementById('selRevenueMeta').innerHTML =
+    `同比 ${p.revenue_yoy_pct > 0 ? '+' : ''}${fmt.pct(p.revenue_yoy_pct)}`;
 }
 
-function renderProvinceChart(metricKey) {
-  const { label, formatter } = byMetricKey(metricKey);
-  const data = [...state.data.provinces].sort((a,b) => b[metricKey] - a[metricKey]);
+function generateNarrative(p) {
+  const nat = state.data.national;
+  const rankVol = rankOf('volume_billion', p.province);
+  const rankYoY = rankOf('volume_yoy_pct', p.province);
+  
+  let tone = "";
+  if (rankVol <= 3) tone = "作为全国快递重镇，";
+  else if (p.volume_yoy_pct > 30) tone = "作为快速崛起的黑马，";
+  
+  const compareNat = p.volume_yoy_pct > nat.volume_yoy_pct 
+    ? `跑赢全国大盘（${nat.volume_yoy_pct}%）` 
+    : `低于全国平均增速`;
 
-  const x = data.map(d => d[metricKey]);
-  const y = data.map(d => d.province);
+  const html = `
+    <strong>${tone}【${p.province}】</strong> 2024年快递业务量达到 <span class="highlight-num">${fmt.piecesB(p.volume_billion)}亿件</span>，
+    在全国排名第 <span class="highlight-num">${rankVol}</span> 位。
+    <br><br>
+    这一年，该省业务量同比增长 <span class="highlight-num">${fmt.pct(p.volume_yoy_pct)}</span>，
+    增速排名第 ${rankYoY} 位，${compareNat}。
+    无论是规模还是活力，数据都反映出当地电商与物流产业的最新温差。
+  `;
+  
+  document.getElementById('autoSummary').innerHTML = html;
+}
 
-  // highlight selected
-  const colors = data.map(d => d.province === state.selectedProvince ? 'rgba(125,211,252,.95)' : 'rgba(160,180,200,.55)');
-
-  const customdata = x.map(v => formatter(v));
-
-  const trace = {
-    type: 'bar',
-    orientation: 'h',
+function renderCharts() {
+  const metricKey = document.getElementById('metricSelect').value;
+  const topKey = document.getElementById('topSelect').value;
+  
+  // 1. 省份排名图
+  const pData = [...state.data.provinces].sort((a,b) => b[metricKey] - a[metricKey]);
+  const x = pData.map(d => d[metricKey]);
+  const y = pData.map(d => d.province);
+  // 高亮选中颜色
+  const colors = pData.map(d => d.province === state.selectedProvince ? '#38bdf8' : 'rgba(56, 189, 248, 0.2)');
+  
+  const trace1 = {
+    type: 'bar', orientation: 'h',
     x, y,
-    marker: { color: colors },
-    customdata,
-    hovertemplate: `%{y}<br>${label}：%{customdata}<extra></extra>`,
+    marker: { color: colors, opacity: 0.9, line: { width:0 } },
+    hovertemplate: `%{y}: %{x}<extra></extra>`
   };
-
-  const layout = {
-    margin: { l: 70, r: 20, t: 10, b: 40 },
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    font: { color: '#e6edf3' },
-    xaxis: { title: label, gridcolor: 'rgba(255,255,255,.06)', zerolinecolor: 'rgba(255,255,255,.06)' },
-    yaxis: { automargin: true },
-    height: Math.max(420, 18 * y.length + 120),
-  };
-
-  Plotly.react('chartProvince', [trace], layout, {displayModeBar: false, responsive: true});
-
-  const chartDiv = document.getElementById('chartProvince');
-  chartDiv.on('plotly_click', (ev) => {
-    const p = ev.points?.[0]?.y;
-    if (!p) return;
-    setSelectedProvince(p);
+  
+  const layout1 = getChartLayout('', '');
+  layout1.height = Math.max(500, y.length * 25);
+  layout1.margin.l = 70;
+  
+  Plotly.react('chartProvince', [trace1], layout1, {displayModeBar: false, responsive: true});
+  
+  // 绑定点击事件
+  document.getElementById('chartProvince').on('plotly_click', data => {
+    const clickedProv = data.points[0].y;
+    setSelectedProvince(clickedProv);
   });
-}
 
-function renderTopChart(metricKey) {
-  const { label, formatter } = byMetricKey(metricKey);
-  const top = [...state.data.provinces]
-    .sort((a, b) => b[metricKey] - a[metricKey])
-    .slice(0, 10);
-
-  const x = top.map(d => d[metricKey]);
-  const y = top.map(d => d.province);
-  const colors = top.map(d => d.province === state.selectedProvince ? 'rgba(125,211,252,.95)' : 'rgba(160,180,200,.55)');
-  const customdata = x.map(v => formatter(v));
-
-  const trace = {
-    type: 'bar',
-    orientation: 'h',
-    x, y,
-    marker: { color: colors },
-    customdata,
-    hovertemplate: `%{y}<br>${label}：%{customdata}<extra></extra>`,
+  // 2. Top 10 图
+  const topData = [...state.data.provinces].sort((a, b) => b[topKey] - a[topKey]).slice(0, 10);
+  const trace2 = {
+    type: 'bar', orientation: 'h',
+    x: topData.map(d => d[topKey]),
+    y: topData.map(d => d.province),
+    marker: { color: '#818cf8' }, // 不同的颜色
+    text: topData.map(d => d[topKey].toFixed(1)),
+    textposition: 'auto',
+    hovertemplate: `%{y}: %{x}<extra></extra>`
   };
+  Plotly.react('chartGrowth', [trace2], getChartLayout('', ''), {displayModeBar: false, responsive: true});
 
-  const layout = {
-    margin: { l: 70, r: 20, t: 10, b: 40 },
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    font: { color: '#e6edf3' },
-    xaxis: { title: label, gridcolor: 'rgba(255,255,255,.06)', zerolinecolor: 'rgba(255,255,255,.06)' },
-    yaxis: { automargin: true },
-    height: 420,
-  };
-
-  Plotly.react('chartGrowth', [trace], layout, { displayModeBar: false, responsive: true });
-
-  const chartDiv = document.getElementById('chartGrowth');
-  chartDiv.on('plotly_click', (ev) => {
-    const p = ev.points?.[0]?.y;
-    if (!p) return;
-    setSelectedProvince(p);
-  });
-}
-
-function renderRegionTrend() {
+  // 3. 区域趋势图 (只渲染一次，或者不需要重新排序)
+  // 如果尚未初始化，则不重复渲染以免浪费性能，这里简化处理直接重绘
   const years = state.region.map(d => d.year);
-  const east = state.region.map(d => d.east);
-  const central = state.region.map(d => d.central);
-  const west = state.region.map(d => d.west);
-
-  const traces = [
-    { type:'scatter', mode:'lines+markers', name:'东部', x:years, y:east, hovertemplate:'%{x}：%{y}%<extra></extra>'},
-    { type:'scatter', mode:'lines+markers', name:'中部', x:years, y:central, hovertemplate:'%{x}：%{y}%<extra></extra>'},
-    { type:'scatter', mode:'lines+markers', name:'西部', x:years, y:west, hovertemplate:'%{x}：%{y}%<extra></extra>'},
+  const traceRegion = [
+    { name:'东部', x:years, y:state.region.map(d=>d.east), type:'scatter', mode:'lines+markers', line:{color:'#38bdf8'} },
+    { name:'中部', x:years, y:state.region.map(d=>d.central), type:'scatter', mode:'lines+markers', line:{color:'#facc15'} },
+    { name:'西部', x:years, y:state.region.map(d=>d.west), type:'scatter', mode:'lines+markers', line:{color:'#f472b6'} },
   ];
-
-  const layout = {
-    margin: { l: 60, r: 20, t: 10, b: 40 },
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    font: { color: '#e6edf3' },
-    xaxis: { title:'年份', gridcolor:'rgba(255,255,255,.06)', zerolinecolor:'rgba(255,255,255,.06)' },
-    yaxis: { title:'业务量占比（%）', rangemode:'tozero', gridcolor:'rgba(255,255,255,.06)', zerolinecolor:'rgba(255,255,255,.06)' },
-    height: 420,
-    legend: { orientation: 'h', y: 1.1, x: 0 },
-  };
-
-  Plotly.react('chartRegion', traces, layout, {displayModeBar: false, responsive: true});
+  const layout3 = getChartLayout('年份', '占比 (%)');
+  layout3.legend = { orientation: 'h', y: 1.1 };
+  Plotly.react('chartRegion', traceRegion, layout3, {displayModeBar: false, responsive: true});
 }
 
 function setSelectedProvince(name) {
   state.selectedProvince = name;
   const p = state.data.provinces.find(d => d.province === name) || state.data.provinces[0];
-  setCards(p);
-
-  // keep select in sync
-  const provSel = document.getElementById('provinceSelect');
-  if (provSel && provSel.value !== p.province) provSel.value = p.province;
-
-  // auto summary sentence
-  const nat = state.data.national;
-  const share = (p.volume_billion / nat.volume_billion) * 100;
-  const rankVol = rankOf('volume_billion', p.province);
-  const rankYoY = rankOf('volume_yoy_pct', p.province);
-  const rankRev = rankOf('revenue_billion_yuan', p.province);
-  const summary = `【${p.province}】业务量 ${fmt.piecesB(p.volume_billion)}（第${rankVol}，占全国${share.toFixed(2)}%），同比 ${fmt.pct(p.volume_yoy_pct)}（第${rankYoY}）；收入 ${fmt.yuanB(p.revenue_billion_yuan)}（第${rankRev}），同比 ${fmt.pct(p.revenue_yoy_pct)}。`;
-  const el = document.getElementById('autoSummary');
-  if (el) el.textContent = summary;
-
-  // hero meta (national + region shares 2024)
-  const r2024 = state.region.find(d => d.year === 2024) || state.region[state.region.length - 1];
-  const hero = document.getElementById('heroMeta');
-  if (hero && r2024) {
-    hero.textContent = `2024 全国：${fmt.piecesB(nat.volume_billion)}（同比${fmt.pct(nat.volume_yoy_pct)}）；东/中/西部占比：${r2024.east}% / ${r2024.central}% / ${r2024.west}%。`;
-  }
-
-  const metricKey = document.getElementById('metricSelect').value;
-  renderProvinceChart(metricKey);
-
-  const topKey = document.getElementById('topSelect')?.value || 'volume_yoy_pct';
-  renderTopChart(topKey);
+  
+  // 同步下拉框
+  document.getElementById('provinceSelect').value = p.province;
+  
+  updateCards(p);
+  generateNarrative(p);
+  renderCharts(); // 重绘图表以更新高亮
 }
 
-function initControls() {
-  const provSel = document.getElementById('provinceSelect');
-  provSel.innerHTML = state.data.provinces.map(p => `<option value="${p.province}">${p.province}</option>`).join('');
-  provSel.addEventListener('change', () => setSelectedProvince(provSel.value));
-
-  const provSearch = document.getElementById('provinceSearch');
-  if (provSearch) {
-    provSearch.addEventListener('input', () => {
-      const q = (provSearch.value || '').trim();
-      if (!q) return;
-      const hit = state.data.provinces.find(p => p.province.includes(q));
-      if (hit) setSelectedProvince(hit.province);
-    });
-  }
-
-  const metricSel = document.getElementById('metricSelect');
-  metricSel.addEventListener('change', () => {
-    renderProvinceChart(metricSel.value);
-    if (state.selectedProvince) setSelectedProvince(state.selectedProvince);
-  });
-
-  const topSel = document.getElementById('topSelect');
-  if (topSel) topSel.addEventListener('change', () => renderTopChart(topSel.value));
-}
-
-async function main() {
+async function init() {
   await loadData();
-  initControls();
+  
+  // 填充下拉框
+  const sel = document.getElementById('provinceSelect');
+  sel.innerHTML = state.data.provinces.map(p => `<option value="${p.province}">${p.province}</option>`).join('');
+  
+  // 绑定事件
+  sel.addEventListener('change', (e) => setSelectedProvince(e.target.value));
+  document.getElementById('provinceSearch').addEventListener('input', (e) => {
+    const val = e.target.value.trim();
+    const hit = state.data.provinces.find(p => p.province.includes(val));
+    if (hit) setSelectedProvince(hit.province);
+  });
+  document.getElementById('metricSelect').addEventListener('change', renderCharts);
+  document.getElementById('topSelect').addEventListener('change', renderCharts);
 
-  // default: pick the top-volume province
-  const top = [...state.data.provinces].sort((a,b) => b.volume_billion - a.volume_billion)[0];
-  document.getElementById('provinceSelect').value = top.province;
-
-  renderRegionTrend();
-  setSelectedProvince(top.province);
+  // 默认选中量最大的省
+  const topProv = [...state.data.provinces].sort((a,b) => b.volume_billion - a.volume_billion)[0];
+  setSelectedProvince(topProv.province);
 }
 
-main().catch(err => {
-  console.error(err);
-  document.body.innerHTML = '<div style="padding:24px;color:#e6edf3">加载失败：请在 GitHub Pages 或本地 HTTP 服务中打开（不要直接双击打开 HTML）。</div>';
-});
+init();

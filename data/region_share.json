@@ -1,0 +1,32 @@
+[
+  {
+    "year": 2015,
+    "east": 82.0,
+    "central": 11.2,
+    "west": 6.8
+  },
+  {
+    "year": 2019,
+    "east": 79.7,
+    "central": 12.9,
+    "west": 7.4
+  },
+  {
+    "year": 2020,
+    "east": 79.4,
+    "central": 13.3,
+    "west": 7.3
+  },
+  {
+    "year": 2023,
+    "east": 75.2,
+    "central": 16.7,
+    "west": 8.1
+  },
+  {
+    "year": 2024,
+    "east": 72.4,
+    "central": 18.7,
+    "west": 8.9
+  }
+]

@@ -1,0 +1,235 @@
+{
+  "year": 2024,
+  "unit": {
+    "volume_billion": "亿件",
+    "revenue_billion_yuan": "亿元",
+    "pct": "%"
+  },
+  "note": "数据来自国家邮政局《2024年邮政行业运行情况》分省快递业务量和业务收入情况表。快递业务量为企业收寄量口径；部分企业调整口径，同比按可比口径计算。",
+  "national": {
+    "province": "全国",
+    "volume_billion": 1750.8,
+    "volume_yoy_pct": 21.5,
+    "revenue_billion_yuan": 14033.5,
+    "revenue_yoy_pct": 13.8
+  },
+  "provinces": [
+    {
+      "province": "北京",
+      "volume_billion": 26.9,
+      "volume_yoy_pct": 9.6,
+      "revenue_billion_yuan": 316.9,
+      "revenue_yoy_pct": 0.7
+    },
+    {
+      "province": "天津",
+      "volume_billion": 19.4,
+      "volume_yoy_pct": 27.2,
+      "revenue_billion_yuan": 187.5,
+      "revenue_yoy_pct": 18.0
+    },
+    {
+      "province": "河北",
+      "volume_billion": 95.4,
+      "volume_yoy_pct": 31.8,
+      "revenue_billion_yuan": 582.6,
+      "revenue_yoy_pct": 22.0
+    },
+    {
+      "province": "山西",
+      "volume_billion": 15.5,
+      "volume_yoy_pct": 29.4,
+      "revenue_billion_yuan": 133.6,
+      "revenue_yoy_pct": 17.6
+    },
+    {
+      "province": "内蒙古",
+      "volume_billion": 5.8,
+      "volume_yoy_pct": 44.0,
+      "revenue_billion_yuan": 79.3,
+      "revenue_yoy_pct": 21.9
+    },
+    {
+      "province": "辽宁",
+      "volume_billion": 29.2,
+      "volume_yoy_pct": 21.4,
+      "revenue_billion_yuan": 239.2,
+      "revenue_yoy_pct": 16.5
+    },
+    {
+      "province": "吉林",
+      "volume_billion": 10.1,
+      "volume_yoy_pct": 21.4,
+      "revenue_billion_yuan": 97.9,
+      "revenue_yoy_pct": 15.2
+    },
+    {
+      "province": "黑龙江",
+      "volume_billion": 12.9,
+      "volume_yoy_pct": 25.9,
+      "revenue_billion_yuan": 128.1,
+      "revenue_yoy_pct": 17.2
+    },
+    {
+      "province": "上海",
+      "volume_billion": 49.5,
+      "volume_yoy_pct": 27.5,
+      "revenue_billion_yuan": 2519.2,
+      "revenue_yoy_pct": 20.3
+    },
+    {
+      "province": "江苏",
+      "volume_billion": 139.2,
+      "volume_yoy_pct": 19.0,
+      "revenue_billion_yuan": 1017.1,
+      "revenue_yoy_pct": 9.4
+    },
+    {
+      "province": "浙江",
+      "volume_billion": 321.9,
+      "volume_yoy_pct": 10.4,
+      "revenue_billion_yuan": 1483.1,
+      "revenue_yoy_pct": 9.5
+    },
+    {
+      "province": "安徽",
+      "volume_billion": 62.7,
+      "volume_yoy_pct": 24.8,
+      "revenue_billion_yuan": 328.0,
+      "revenue_yoy_pct": 15.2
+    },
+    {
+      "province": "福建",
+      "volume_billion": 62.1,
+      "volume_yoy_pct": 13.7,
+      "revenue_billion_yuan": 438.5,
+      "revenue_yoy_pct": 9.9
+    },
+    {
+      "province": "江西",
+      "volume_billion": 34.1,
+      "volume_yoy_pct": 30.6,
+      "revenue_billion_yuan": 239.4,
+      "revenue_yoy_pct": 23.4
+    },
+    {
+      "province": "山东",
+      "volume_billion": 95.2,
+      "volume_yoy_pct": 24.7,
+      "revenue_billion_yuan": 635.6,
+      "revenue_yoy_pct": 17.4
+    },
+    {
+      "province": "河南",
+      "volume_billion": 90.5,
+      "volume_yoy_pct": 38.0,
+      "revenue_billion_yuan": 534.0,
+      "revenue_yoy_pct": 22.2
+    },
+    {
+      "province": "湖北",
+      "volume_billion": 56.3,
+      "volume_yoy_pct": 29.8,
+      "revenue_billion_yuan": 375.1,
+      "revenue_yoy_pct": 17.7
+    },
+    {
+      "province": "湖南",
+      "volume_billion": 45.8,
+      "volume_yoy_pct": 25.9,
+      "revenue_billion_yuan": 256.7,
+      "revenue_yoy_pct": 12.2
+    },
+    {
+      "province": "广东",
+      "volume_billion": 425.9,
+      "volume_yoy_pct": 19.5,
+      "revenue_billion_yuan": 3041.5,
+      "revenue_yoy_pct": 6.9
+    },
+    {
+      "province": "广西",
+      "volume_billion": 20.1,
+      "volume_yoy_pct": 37.7,
+      "revenue_billion_yuan": 166.4,
+      "revenue_yoy_pct": 22.6
+    },
+    {
+      "province": "海南",
+      "volume_billion": 2.5,
+      "volume_yoy_pct": 13.4,
+      "revenue_billion_yuan": 41.5,
+      "revenue_yoy_pct": 8.4
+    },
+    {
+      "province": "重庆",
+      "volume_billion": 20.5,
+      "volume_yoy_pct": 31.7,
+      "revenue_billion_yuan": 164.5,
+      "revenue_yoy_pct": 17.8
+    },
+    {
+      "province": "四川",
+      "volume_billion": 47.3,
+      "volume_yoy_pct": 26.0,
+      "revenue_billion_yuan": 379.8,
+      "revenue_yoy_pct": 14.4
+    },
+    {
+      "province": "贵州",
+      "volume_billion": 9.9,
+      "volume_yoy_pct": 39.1,
+      "revenue_billion_yuan": 110.4,
+      "revenue_yoy_pct": 20.2
+    },
+    {
+      "province": "云南",
+      "volume_billion": 14.7,
+      "volume_yoy_pct": 29.0,
+      "revenue_billion_yuan": 136.4,
+      "revenue_yoy_pct": 17.2
+    },
+    {
+      "province": "西藏",
+      "volume_billion": 0.3,
+      "volume_yoy_pct": 23.3,
+      "revenue_billion_yuan": 8.1,
+      "revenue_yoy_pct": 22.4
+    },
+    {
+      "province": "陕西",
+      "volume_billion": 25.6,
+      "volume_yoy_pct": 50.4,
+      "revenue_billion_yuan": 212.8,
+      "revenue_yoy_pct": 29.2
+    },
+    {
+      "province": "甘肃",
+      "volume_billion": 4.4,
+      "volume_yoy_pct": 41.7,
+      "revenue_billion_yuan": 67.0,
+      "revenue_yoy_pct": 24.8
+    },
+    {
+      "province": "青海",
+      "volume_billion": 0.7,
+      "volume_yoy_pct": 21.3,
+      "revenue_billion_yuan": 15.9,
+      "revenue_yoy_pct": 19.4
+    },
+    {
+      "province": "宁夏",
+      "volume_billion": 1.8,
+      "volume_yoy_pct": 32.6,
+      "revenue_billion_yuan": 23.3,
+      "revenue_yoy_pct": 18.6
+    },
+    {
+      "province": "新疆",
+      "volume_billion": 4.6,
+      "volume_yoy_pct": 39.2,
+      "revenue_billion_yuan": 73.9,
+      "revenue_yoy_pct": 15.3
+    }
+  ]
+}

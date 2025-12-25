@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="用国家邮政局公开数据做一张可交互的快递版图：分省业务量与增速、东中西部占比变化。" />
+  <meta property="og:title" content="你所在省一年“收”多少快递？——快递版图的中西部上升" />
+  <meta property="og:description" content="分省快递业务量/收入与增速可视化，展示东中西部占比变化（2015—2024）。" />
+  <meta property="og:type" content="website" />
+  <title>你所在省一年收多少快递？——快递版图的“中西部上升”</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+</head>
+<body>
+  <header class="container">
+    <h1>你所在省一年“收”多少快递？</h1>
+    <p class="sub">
+      以国家邮政局公开统计为底稿，做一张可交互的快递版图：分省业务量与增速、以及东中西部占比的十年变化（2015—2024）。
+    </p>
+  </header>
+
+  <main class="container">
+    <section class="panel controls">
+      <div class="control">
+        <label for="provinceSelect">选择省份</label>
+        <select id="provinceSelect" aria-label="选择省份"></select>
+      </div>
+      <div class="control">
+        <label for="metricSelect">排名指标</label>
+        <select id="metricSelect" aria-label="排名指标">
+          <option value="volume_billion">快递业务量（亿件）</option>
+          <option value="volume_yoy_pct">业务量同比（%）</option>
+          <option value="revenue_billion_yuan">快递业务收入（亿元）</option>
+          <option value="revenue_yoy_pct">收入同比（%）</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="cards">
+        <div class="card">
+          <div class="k">全国（2024）快递业务量</div>
+          <div class="v" id="nationalVolume">—</div>
+          <div class="s" id="nationalVolumeYoy">—</div>
+        </div>
+        <div class="card">
+          <div class="k"><span id="selProvinceName">—</span>（2024）快递业务量</div>
+          <div class="v" id="selVolume">—</div>
+          <div class="s" id="selVolumeMeta">—</div>
+        </div>
+        <div class="card">
+          <div class="k"><span id="selProvinceName2">—</span>（2024）快递业务收入</div>
+          <div class="v" id="selRevenue">—</div>
+          <div class="s" id="selRevenueMeta">—</div>
+        </div>
+      </div>
+      <div class="summary" id="autoSummary">—</div>
+      <p class="note" id="definitionNote">
+        注：“快递业务量”按统计制度为取得快递业务经营许可企业的<strong>收寄</strong>量口径，更接近“在该省被受理并进入寄递网络的件数”，不等同于居民收件数。
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2>分省排名（可点击柱形选择省份）</h2>
+      <div id="chartProvince" class="chart"></div>
+      <p class="hint">提示：点击图中的省份可联动上方卡片与下方图表。</p>
+    </section>
+
+    <section class="panel">
+      <h2>谁在加速？（2024 业务量同比 Top 10）</h2>
+      <div id="chartGrowth" class="chart"></div>
+    </section>
+
+    <section class="panel">
+      <h2>“中西部上升”到底升了多少？（东/中/西部业务量占比）</h2>
+      <div id="chartRegion" class="chart"></div>
+      <p class="hint">数据点来自国家邮政局历年《邮政行业运行情况》年报口径（2015、2019、2020、2023、2024）。</p>
+    </section>
+
+    <section class="panel sources">
+      <h2>数据来源与口径</h2>
+      <p class="hint">下载：<a class="link" href="data/province_2024.json" target="_blank" rel="noopener">分省数据（JSON）</a> · <a class="link" href="data/region_share.json" target="_blank" rel="noopener">区域占比（JSON）</a></p>
+      <ul>
+        <li>国家邮政局《2024年邮政行业运行情况》（含：全国规模、东中西部占比、分省快递业务量与收入表）。</li>
+        <li>国家邮政局历年《邮政行业运行情况》：2015、2019、2020、2023（用于东中西部占比的历史对比）。</li>
+        <li>国家统计局“常见问题解答”：快递业务量统计口径为快递企业收寄量。</li>
+      </ul>
+      <p class="hint">本页为课程作业展示：仅做数据整理与可视化，不对因企业结算地、统计归集方式等因素导致的“业务量/收入”地区差异作因果判断。</p>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <span>Made for Journalism class · GitHub Pages</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

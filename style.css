@@ -1,125 +1,182 @@
-/* Minimal, readable layout */
-:root{
-  --bg:#070b12;
-  --panel:#0f1726;
-  --panel2:#0c1321;
-  --text:#e6edf3;
-  --muted:#9fb0c0;
-  --border:rgba(255,255,255,.10);
-  --accent:#7dd3fc; /* light cyan */
-  --accent2:#a78bfa; /* soft purple */
+/* style.css - 优化版 */
+:root {
+  --bg: #050914;
+  --panel: rgba(20, 30, 48, 0.6);
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --text: #e6edf3;
+  --text-muted: #94a3b8;
+  --accent: #38bdf8; /* 天蓝色 */
+  --accent-glow: rgba(56, 189, 248, 0.2);
+  --highlight: #facc15; /* 金黄色，用于强调 */
+  --font-serif: "Georgia", "Nimrod", "Songti SC", "Noto Serif SC", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:
-    radial-gradient(900px 500px at 20% -10%, rgba(125,211,252,.18), transparent 60%),
-    radial-gradient(800px 500px at 90% 0%, rgba(167,139,250,.16), transparent 55%),
-    radial-gradient(900px 600px at 50% 120%, rgba(34,211,238,.10), transparent 60%),
-    var(--bg);
-  color:var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "PingFang SC","Hiragino Sans GB","Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
-  line-height:1.6;
-}
-.container{max-width:1100px;margin:0 auto;padding:22px 18px;}
+* { box-sizing: border-box; }
 
-.hero{
-  border-bottom:1px solid var(--border);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)),
-    rgba(0,0,0,.10);
+body {
+  margin: 0;
+  background-color: var(--bg);
+  /* 更细腻的背景光晕 */
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
 }
 
-.hero h1{
-  margin:0 0 10px 0;
-  font-size: clamp(28px, 4.2vw, 46px);
-  line-height:1.15;
-  letter-spacing:.2px;
-  overflow-wrap:anywhere;
+.container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+
+/* 头部设计 */
+.hero {
+  text-align: center;
+  margin-bottom: 60px;
+  position: relative;
 }
 
-.sub{margin:0;color:var(--muted);max-width:62ch}
-
-.heroMeta{
-  margin-top:14px;
-  display:inline-block;
-  padding:8px 12px;
-  border:1px dashed var(--border);
-  border-radius:14px;
-  background:rgba(0,0,0,.15);
-  color:var(--muted);
-  font-size:12px;
-}
-.panel{
-  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)) , var(--panel);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:16px;
-  margin:14px 0;
-  box-shadow: 0 10px 30px rgba(0,0,0,.25);
-}
-.controls{
-  display:flex; gap:12px; flex-wrap:wrap; align-items:end;
-}
-.control{min-width:220px; flex:1}
-label{display:block;color:var(--muted);font-size:12px;margin:0 0 6px}
-select, input[type="search"]{
-  width:100%;
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:var(--panel2);
-  color:var(--text);
-  outline:none;
-}
-input[type="search"]::placeholder{color:rgba(159,176,192,.75)}
-select:focus, input[type="search"]:focus{border-color:rgba(125,211,252,.45); box-shadow:0 0 0 3px rgba(125,211,252,.12)}
-.cards{
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap:12px;
-}
-.card{
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:12px;
-  background:var(--panel2);
-  transition: transform .12s ease, border-color .12s ease;
-}
-.card:hover{transform: translateY(-2px); border-color: rgba(125,211,252,.25)}
-.k{color:var(--muted);font-size:12px;margin-bottom:8px}
-.v{font-size:26px;font-weight:700}
-.s{color:var(--muted);font-size:12px;margin-top:6px}
-.chart{width:100%;min-height:420px}
-.note{color:var(--muted);font-size:12px;margin:10px 0 0}
-.hint{color:var(--muted);font-size:12px;margin:8px 0 0}
-.sources ul{margin:10px 0 0 18px;color:var(--muted)}
-.footer{color:var(--muted);font-size:12px;padding-bottom:40px}
-
-.summary{
-  margin-top:12px;
-  padding:10px 12px;
-  border:1px dashed rgba(125,211,252,.35);
-  border-radius:14px;
-  background:rgba(125,211,252,.06);
-  color:var(--text);
-  font-size:13px;
+.hero::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: var(--accent);
+  margin: 30px auto 0;
+  border-radius: 2px;
 }
 
-.link{color:var(--accent); text-decoration:none}
-.link:hover{text-decoration:underline}
-
-.explain .glossary{display:grid; gap:10px}
-details{
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:10px 12px;
-  background:var(--panel2);
+.hero h1 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: clamp(32px, 5vw, 56px);
+  margin: 0 0 20px 0;
+  line-height: 1.2;
+  text-shadow: 0 0 40px rgba(56,189,248,0.3);
 }
-summary{cursor:pointer; color:var(--text); font-weight:600}
-details p{color:var(--muted); margin:8px 0 0}
-@media (max-width:900px){
-  .cards{grid-template-columns:1fr}
-  .chart{min-height:360px}
+
+.sub {
+  font-size: 18px;
+  color: var(--text-muted);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.heroMeta {
+  display: inline-block;
+  margin-top: 24px;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--panel-border);
+  border-radius: 50px;
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
+
+/* 面板通用样式 */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(12px); /* 毛玻璃效果 */
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 24px;
+  padding: 32px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #fff;
+  border-left: 4px solid var(--accent);
+  padding-left: 12px;
+}
+
+/* 控制栏 */
+.controls {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  background: rgba(0,0,0,0.2); /* 稍微深一点以区分区域 */
+}
+
+.control { flex: 1; min-width: 200px; }
+label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;}
+
+select, input[type="search"] {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--panel-border);
+  background: rgba(255,255,255,0.03);
+  color: #fff;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  background: rgba(255,255,255,0.08);
+}
+
+/* 关键指标卡片 */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 4px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0.5;
+}
+
+.k { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+.v { font-size: 32px; font-weight: 700; color: #fff; font-family: var(--font-sans); letter-spacing: -0.5px;}
+.s { font-size: 13px; color: var(--accent); margin-top: 8px; font-weight: 500; }
+
+/* 自动摘要 */
+.summary {
+  margin-top: 24px;
+  padding: 20px;
+  background: rgba(56, 189, 248, 0.1);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+  color: #dbeafe;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.highlight-num { color: #fff; font-weight: 700; border-bottom: 1px dashed var(--accent); }
+
+/* 图表容器 */
+.chart { width: 100%; min-height: 450px; }
+
+/* 脚注与来源 */
+.sources { font-size: 14px; color: var(--text-muted); }
+.link { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border 0.2s; }
+.link:hover { border-bottom-color: var(--accent); }
+
+/* 响应式微调 */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 32px; }
+  .panel { padding: 20px; }
 }

@@ -1,4 +1,4 @@
-/* style.css - 优化版 */
+/* style.css - 完整优化版（含下拉框修复） */
 :root {
   --bg: #050914;
   --panel: rgba(20, 30, 48, 0.6);
@@ -116,6 +116,12 @@ select, input[type="search"] {
   color: #fff;
   font-size: 15px;
   transition: all 0.2s;
+}
+
+/* === 核心修复：强制下拉选项背景为深色 === */
+select option {
+  background-color: #050914; /* 必须是实心颜色 */
+  color: #fff;
 }
 
 select:focus, input:focus {

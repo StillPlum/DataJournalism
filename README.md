@@ -4,14 +4,6 @@
 
 页面交互包括：省份搜索/下拉选择、分省排名指标切换、Top 10 指标切换与图表联动。
 
-## 在线访问（GitHub Pages）
-1. 打开仓库 **Settings → Pages**
-2. Build and deployment 选择：
-   - Source: **Deploy from a branch**
-   - Branch: **main**
-   - Folder: **/(root)**
-3. 保存后，几分钟内即可看到页面链接：`https://<你的用户名>.github.io/<仓库名>/`
-
 ## 数据与口径
 - `data/province_2024.json`：来自 **国家邮政局《2024年邮政行业运行情况》**（分省快递业务量、业务收入及同比）
 - `data/region_share.json`：来自国家邮政局历年《邮政行业运行情况》（2015、2019、2020、2023、2024），整理得到的东/中/西部业务量占比时间序列
